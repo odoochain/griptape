@@ -20,9 +20,9 @@ class BasePromptDriver(ExponentialBackoffMixin, ABC):
     prompt_stack_to_string: Callable[[PromptStack], str] = field(
         default=Factory(
             lambda self: self.default_prompt_stack_to_string_converter,
-            takes_self=True
+            takes_self=True,
         ),
-        kw_only=True
+        kw_only=True,
     )
 
     model: str
@@ -52,7 +52,7 @@ class BasePromptDriver(ExponentialBackoffMixin, ABC):
                     )
 
                 result = self.try_run(prompt_stack)
-                
+
                 if self.structure:
                     self.structure.publish_event(
                         FinishPromptEvent(
@@ -64,7 +64,9 @@ class BasePromptDriver(ExponentialBackoffMixin, ABC):
 
                 return result
 
-    def default_prompt_stack_to_string_converter(self, prompt_stack: PromptStack) -> str:
+    def default_prompt_stack_to_string_converter(
+        self, prompt_stack: PromptStack
+    ) -> str:
         prompt_lines = []
 
         for i in prompt_stack.inputs:

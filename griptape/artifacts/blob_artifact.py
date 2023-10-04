@@ -15,7 +15,11 @@ class BlobArtifact(BaseArtifact):
 
     @property
     def full_path(self) -> str:
-        return os.path.join(self.dir_name, self.name) if self.dir_name else self.name
+        return (
+            os.path.join(self.dir_name, self.name)
+            if self.dir_name
+            else self.name
+        )
 
     def to_text(self) -> str:
         return self.full_path

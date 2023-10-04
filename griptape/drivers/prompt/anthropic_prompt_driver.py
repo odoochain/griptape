@@ -14,6 +14,7 @@ class AnthropicPromptDriver(BasePromptDriver):
         model: Anthropic model name.
         tokenizer: Custom `AnthropicTokenizer`.
     """
+
     api_key: str = field(kw_only=True)
     model: str = field(kw_only=True)
     tokenizer: AnthropicTokenizer = field(
@@ -35,7 +36,9 @@ class AnthropicPromptDriver(BasePromptDriver):
 
         return TextArtifact(value=response.completion)
 
-    def default_prompt_stack_to_string_converter(self, prompt_stack: PromptStack) -> str:
+    def default_prompt_stack_to_string_converter(
+        self, prompt_stack: PromptStack
+    ) -> str:
         prompt_lines = []
 
         for i in prompt_stack.inputs:

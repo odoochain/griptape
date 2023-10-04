@@ -15,7 +15,7 @@ from .dict_utils import remove_null_values_in_dict_recursively
 
 
 def minify_json(value: str) -> str:
-    return json.dumps(json.loads(value), separators=(',', ':'))
+    return json.dumps(json.loads(value), separators=(",", ":"))
 
 
 __all__ = [
@@ -31,5 +31,5 @@ __all__ = [
     "execute_futures_dict",
     "TokenCounter",
     "PromptStack",
-    "remove_null_values_in_dict_recursively"
+    "remove_null_values_in_dict_recursively",
 ]

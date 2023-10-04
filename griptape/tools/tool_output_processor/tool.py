@@ -13,6 +13,13 @@ class ToolOutputProcessor(BaseTool, TextMemoryActivitiesMixin):
         Override parent method to only return TextToolMemory
         """
         if self.input_memory:
-            return next((m for m in self.input_memory if isinstance(m, TextToolMemory) and m.name == memory_name), None)
+            return next(
+                (
+                    m
+                    for m in self.input_memory
+                    if isinstance(m, TextToolMemory) and m.name == memory_name
+                ),
+                None,
+            )
         else:
             return None

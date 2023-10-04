@@ -31,4 +31,3 @@ class BaseMultiModelPromptDriver(BasePromptDriver, ABC):
 
         if not self.tokenizer:
             self.tokenizer = self.prompt_model_driver.tokenizer
-

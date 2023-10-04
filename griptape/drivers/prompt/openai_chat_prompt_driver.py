@@ -14,27 +14,36 @@ class OpenAiChatPromptDriver(BasePromptDriver):
     """
     Attributes:
         api_type: Can be changed to use OpenAI models on Azure.
-        api_version: API version. 
+        api_version: API version.
         api_base: API URL.
         api_key: API key to pass directly; by default uses `OPENAI_API_KEY_PATH` environment variable.
         max_tokens: Optional maximum return tokens. If not specified, the value will be automatically generated based by the tokenizer.
         model: OpenAI model name. Uses `gpt-4` by default.
         organization: OpenAI organization.
         tokenizer: Custom `OpenAiTokenizer`.
-        user: OpenAI user. 	
+        user: OpenAI user.
     """
+
     api_type: str = field(default=openai.api_type, kw_only=True)
     api_version: Optional[str] = field(default=openai.api_version, kw_only=True)
     api_base: str = field(default=openai.api_base, kw_only=True)
-    api_key: Optional[str] = field(default=Factory(lambda: os.environ.get("OPENAI_API_KEY")), kw_only=True)
-    organization: Optional[str] = field(default=openai.organization, kw_only=True)
+    api_key: Optional[str] = field(
+        default=Factory(lambda: os.environ.get("OPENAI_API_KEY")), kw_only=True
+    )
+    organization: Optional[str] = field(
+        default=openai.organization, kw_only=True
+    )
     model: str = field(kw_only=True)
     tokenizer: OpenAiTokenizer = field(
-        default=Factory(lambda self: OpenAiTokenizer(model=self.model), takes_self=True),
-        kw_only=True
+        default=Factory(
+            lambda self: OpenAiTokenizer(model=self.model), takes_self=True
+        ),
+        kw_only=True,
     )
     user: str = field(default="", kw_only=True)
-    ignored_exception_types: Tuple[Type[Exception], ...] = field(default=Factory(lambda: (openai.InvalidRequestError)), kw_only=True)
+    ignored_exception_types: Tuple[Type[Exception], ...] = field(
+        default=Factory(lambda: (openai.InvalidRequestError)), kw_only=True
+    )
 
     def try_run(self, prompt_stack: PromptStack) -> TextArtifact:
         result = openai.ChatCompletion.create(**self._base_params(prompt_stack))
@@ -44,19 +53,21 @@ class OpenAiChatPromptDriver(BasePromptDriver):
                 value=result.choices[0]["message"]["content"].strip()
             )
         else:
-            raise Exception("Completion with more than one choice is not supported yet.")
+            raise Exception(
+                "Completion with more than one choice is not supported yet."
+            )
 
     def token_count(self, prompt_stack: PromptStack) -> int:
         return self.tokenizer.token_count(
             self._prompt_stack_to_messages(prompt_stack)
         )
 
-    def _prompt_stack_to_messages(self, prompt_stack: PromptStack) -> list[dict]:
+    def _prompt_stack_to_messages(
+        self, prompt_stack: PromptStack
+    ) -> list[dict]:
         return [
-            {
-                "role": self.__to_openai_role(i),
-                "content": i.content
-            } for i in prompt_stack.inputs
+            {"role": self.__to_openai_role(i), "content": i.content}
+            for i in prompt_stack.inputs
         ]
 
     def _base_params(self, prompt_stack: PromptStack) -> dict:
@@ -73,7 +84,7 @@ class OpenAiChatPromptDriver(BasePromptDriver):
             "api_version": self.api_version,
             "api_base": self.api_base,
             "api_type": self.api_type,
-            "messages": messages
+            "messages": messages,
         }
 
     def __to_openai_role(self, prompt_input: PromptStack.Input) -> str:

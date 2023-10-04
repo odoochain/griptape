@@ -15,8 +15,7 @@ class LocalBlobToolMemoryDriver(BaseBlobToolMemoryDriver):
 
     def load(self, namespace: str) -> list[BlobArtifact]:
         return next(
-            (blobs for key, blobs in self.blobs.items() if key == namespace),
-            []
+            (blobs for key, blobs in self.blobs.items() if key == namespace), []
         )
 
     def delete(self, namespace: str) -> None:

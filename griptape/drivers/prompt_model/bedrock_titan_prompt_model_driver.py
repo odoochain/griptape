@@ -21,7 +21,7 @@ class BedrockTitanPromptModelDriver(BasePromptModelDriver):
         Tokenizer. However, the Prompt Driver is not initialized until after
         the Prompt Model Driver is initialized. To resolve this, we make the `tokenizer`
         field a @property that is only initialized when it is first accessed.
-        This ensures that by the time we need to initialize the Tokenizer, the 
+        This ensures that by the time we need to initialize the Tokenizer, the
         Prompt Driver has already been initialized and we can access its session.
 
         See this thread more more information: https://github.com/griptape-ai/griptape/issues/244
@@ -33,10 +33,14 @@ class BedrockTitanPromptModelDriver(BasePromptModelDriver):
             return self._tokenizer
         else:
             if isinstance(self.prompt_driver, AmazonBedrockPromptDriver):
-                self._tokenizer = BedrockTitanTokenizer(model=self.model, session=self.prompt_driver.session)
+                self._tokenizer = BedrockTitanTokenizer(
+                    model=self.model, session=self.prompt_driver.session
+                )
                 return self._tokenizer
             else:
-                raise ValueError("prompt_driver must be of instance AmazonBedrockPromptDriver")
+                raise ValueError(
+                    "prompt_driver must be of instance AmazonBedrockPromptDriver"
+                )
 
     def prompt_stack_to_model_input(self, prompt_stack: PromptStack) -> dict:
         prompt_lines = []
@@ -52,9 +56,9 @@ class BedrockTitanPromptModelDriver(BasePromptModelDriver):
                 prompt_lines.append(i.content)
         prompt_lines.append("Bot:")
 
-        prompt = '\n\n'.join(prompt_lines)
+        prompt = "\n\n".join(prompt_lines)
 
-        return { "inputText": prompt }
+        return {"inputText": prompt}
 
     def prompt_stack_to_model_params(self, prompt_stack: PromptStack) -> dict:
         prompt = self.prompt_stack_to_model_input(prompt_stack)["inputText"]

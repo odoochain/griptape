@@ -7,7 +7,10 @@ from typing import Optional, TYPE_CHECKING, Callable, Type
 from attr import define, field, Factory
 from rich.logging import RichHandler
 from griptape.drivers import BasePromptDriver, OpenAiChatPromptDriver
-from griptape.drivers.embedding.openai_embedding_driver import OpenAiEmbeddingDriver, BaseEmbeddingDriver
+from griptape.drivers.embedding.openai_embedding_driver import (
+    OpenAiEmbeddingDriver,
+    BaseEmbeddingDriver,
+)
 from griptape.memory.structure import ConversationMemory
 from griptape.memory.tool import BaseToolMemory, TextToolMemory
 from griptape.rules import Ruleset, Rule
@@ -26,32 +29,38 @@ class Structure(ABC):
 
     id: str = field(default=Factory(lambda: uuid.uuid4().hex), kw_only=True)
     prompt_driver: BasePromptDriver = field(
-        default=Factory(lambda: OpenAiChatPromptDriver(
-            model=OpenAiTokenizer.DEFAULT_OPENAI_GPT_4_MODEL
-        )),
-        kw_only=True
+        default=Factory(
+            lambda: OpenAiChatPromptDriver(
+                model=OpenAiTokenizer.DEFAULT_OPENAI_GPT_4_MODEL
+            )
+        ),
+        kw_only=True,
     )
     embedding_driver: BaseEmbeddingDriver = field(
-        default=Factory(lambda: OpenAiEmbeddingDriver()),
-        kw_only=True
+        default=Factory(lambda: OpenAiEmbeddingDriver()), kw_only=True
     )
     rulesets: list[Ruleset] = field(factory=list, kw_only=True)
     rules: list[Rule] = field(factory=list, kw_only=True)
     tasks: list[BaseTask] = field(factory=list, kw_only=True)
     custom_logger: Optional[Logger] = field(default=None, kw_only=True)
     logger_level: int = field(default=logging.INFO, kw_only=True)
-    event_listeners: list[Callable] | dict[Type[BaseEvent], list[Callable]] = field(factory=list, kw_only=True)
+    event_listeners: list[Callable] | dict[
+        Type[BaseEvent], list[Callable]
+    ] = field(factory=list, kw_only=True)
     memory: Optional[ConversationMemory] = field(default=None, kw_only=True)
     tool_memory: Optional[BaseToolMemory] = field(
-        default=Factory(lambda self: TextToolMemory(
-            query_engine=VectorQueryEngine(
-                vector_store_driver=LocalVectorStoreDriver(
-                    embedding_driver=self.embedding_driver
-                )
+        default=Factory(
+            lambda self: TextToolMemory(
+                query_engine=VectorQueryEngine(
+                    vector_store_driver=LocalVectorStoreDriver(
+                        embedding_driver=self.embedding_driver
+                    )
+                ),
+                summary_engine=PromptSummaryEngine(),
             ),
-            summary_engine=PromptSummaryEngine()
-        ), takes_self=True),
-        kw_only=True
+            takes_self=True,
+        ),
+        kw_only=True,
     )
     _execution_args: tuple = ()
     _logger: Optional[Logger] = None
@@ -59,7 +68,9 @@ class Structure(ABC):
     @tasks.validator
     def validate_tasks(self, _, tasks: list[BaseTask]) -> None:
         if len(tasks) > 0:
-            raise ValueError("Tasks can't be initialized directly. Use add_task or add_tasks method instead")
+            raise ValueError(
+                "Tasks can't be initialized directly. Use add_task or add_tasks method instead"
+            )
 
     @rulesets.validator
     def validate_rulesets(self, _, rulesets: list[Ruleset]) -> None:
@@ -101,10 +112,7 @@ class Structure(ABC):
                 self._logger.level = self.logger_level
 
                 self._logger.handlers = [
-                    RichHandler(
-                        show_time=True,
-                        show_path=False
-                    )
+                    RichHandler(show_time=True, show_path=False)
                 ]
             return self._logger
 
